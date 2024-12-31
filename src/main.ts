@@ -1,22 +1,79 @@
 import { invoke } from "@tauri-apps/api/core";
 
-let greetInputEl: HTMLInputElement | null;
 let greetMsgEl: HTMLElement | null;
 
 async function greet() {
-  if (greetMsgEl && greetInputEl) {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    greetMsgEl.textContent = await invoke("greet", {
-      name: greetInputEl.value,
+    let msg: string = await invoke("greet", {
+        name: "Kramer",
     });
-  }
+
+    if (greetMsgEl) {
+        greetMsgEl.innerHTML += msg + "<br>";
+    }
+}
+
+async function greet2() {
+    let msg = await invoke("greet2", {
+        firstName: "James",
+        lastName: "Bond",
+    });
+
+    if (greetMsgEl) {
+        greetMsgEl.innerHTML += msg + "<br>";
+    }
+}
+
+async function savePreferences() {
+    await invoke("save_preferences", {
+        preferences: {
+            firstName: "Kramer",
+            theme: "dark",
+        },
+    });
+}
+
+async function blocking() {
+    console.log(await invoke("blocking_cmd"));
+}
+
+async function non_blocking() {
+    console.log(await invoke("non_blocking_cmd"));
+}
+
+async function appHandle() {
+    await invoke("using_app_handle");
+}
+
+async function hide() {
+    setTimeout(() => {
+        invoke("hide_window");
+    }, 3000);
+}
+
+
+async function usingState() {
+    await invoke("using_state");
+}
+
+
+async function errors() {
+    try {
+        await invoke("errors");
+    } catch (e) {
+        console.error(e)
+    }
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  greetInputEl = document.querySelector("#greet-input");
-  greetMsgEl = document.querySelector("#greet-msg");
-  document.querySelector("#greet-form")?.addEventListener("submit", (e) => {
-    e.preventDefault();
+    greetMsgEl = document.querySelector("#greet-msg");
+
     greet();
-  });
+    // greet2();
+    // savePreferences();
+    // blocking();
+    // non_blocking();
+    // appHandle();
+    // hide();
+    // usingState();
+    // errors();
 });
